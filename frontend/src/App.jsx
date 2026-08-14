@@ -1558,7 +1558,7 @@ function AboutPage() {
         <p>
           The CSS source file also contains an explicit
           comment citing ChatGPT's design assistance, as
-          requested for the course project help.
+          requested for the course project help.</p>
 
         <p>
           Financial information is retrieved from Yahoo
