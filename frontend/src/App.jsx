@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FiActivity,
   FiArrowLeft,
@@ -7,6 +7,7 @@ import {
   FiBriefcase,
   FiDollarSign,
   FiExternalLink,
+  FiGlobe,
   FiHome,
   FiInfo,
   FiSearch,
@@ -16,405 +17,498 @@ import {
 } from "react-icons/fi";
 import "./App.css";
 
-const companies = [
-  {
-    ticker: "WDAY",
-    name: "Workday",
-    direction: "gainer",
-    change: 17.4,
-    price: "$241.80",
-    sector: "Enterprise Software",
-    description:
-      "Workday develops cloud-based software for finance, human resources, planning, and enterprise management.",
-    revenue: "$9.4B",
-    revenueGrowth: "+15.2%",
-    operatingMargin: "24.6%",
-    eps: "$7.18",
-    marketCap: "$65B",
-    range: "$199 – $294",
-    chart: [38, 42, 40, 45, 43, 48, 52, 51, 58, 60, 68, 78],
-  },
-  {
-    ticker: "SNDK",
-    name: "Sandisk",
-    direction: "gainer",
-    change: 13.9,
-    price: "$318.40",
-    sector: "Data Storage",
-    description:
-      "Sandisk develops flash-memory and storage technologies used across consumer electronics, computing, and data-center applications.",
-    revenue: "$8.7B",
-    revenueGrowth: "+21.4%",
-    operatingMargin: "19.8%",
-    eps: "$5.42",
-    marketCap: "$44B",
-    range: "$172 – $326",
-    chart: [30, 34, 38, 36, 42, 46, 51, 55, 62, 67, 73, 82],
-  },
-  {
-    ticker: "NFLX",
-    name: "Netflix",
-    direction: "gainer",
-    change: 5.3,
-    price: "$1,286.50",
-    sector: "Entertainment",
-    description:
-      "Netflix is a global streaming entertainment company offering subscription-based television, film, and interactive content.",
-    revenue: "$48.2B",
-    revenueGrowth: "+13.1%",
-    operatingMargin: "29.4%",
-    eps: "$25.84",
-    marketCap: "$540B",
-    range: "$875 – $1,310",
-    chart: [43, 46, 44, 48, 53, 51, 57, 62, 60, 66, 72, 76],
-  },
-  {
-    ticker: "MU",
-    name: "Micron Technology",
-    direction: "gainer",
-    change: 4.1,
-    price: "$248.70",
-    sector: "Semiconductors",
-    description:
-      "Micron Technology produces memory and storage products, including DRAM and NAND technologies used in AI systems, computers, and data centers.",
-    revenue: "$39.6B",
-    revenueGrowth: "+28.7%",
-    operatingMargin: "31.8%",
-    eps: "$12.46",
-    marketCap: "$278B",
-    range: "$142 – $267",
-    chart: [36, 41, 45, 43, 49, 55, 53, 60, 64, 69, 74, 79],
-  },
-  {
-    ticker: "META",
-    name: "Meta Platforms",
-    direction: "gainer",
-    change: 2.7,
-    price: "$782.20",
-    sector: "Communication Services",
-    description:
-      "Meta Platforms operates Facebook, Instagram, WhatsApp, Threads, and a growing portfolio of artificial-intelligence and virtual-reality technologies.",
-    revenue: "$186.5B",
-    revenueGrowth: "+16.3%",
-    operatingMargin: "42.1%",
-    eps: "$28.64",
-    marketCap: "$1.97T",
-    range: "$532 – $804",
-    chart: [48, 47, 51, 54, 52, 58, 61, 65, 63, 68, 71, 75],
-  },
 
-  {
-    ticker: "TPR",
-    name: "Tapestry",
-    direction: "loser",
-    change: -16.2,
-    price: "$91.40",
-    sector: "Luxury Retail",
-    description:
-      "Tapestry is the parent company of Coach and Kate Spade and operates a portfolio of global fashion and luxury-accessory brands.",
-    revenue: "$7.3B",
-    revenueGrowth: "+4.8%",
-    operatingMargin: "18.7%",
-    eps: "$5.64",
-    marketCap: "$19B",
-    range: "$57 – $118",
-    chart: [78, 76, 79, 74, 72, 75, 69, 67, 63, 61, 57, 47],
-  },
-  {
-    ticker: "CSCO",
-    name: "Cisco Systems",
-    direction: "loser",
-    change: -8.3,
-    price: "$71.60",
-    sector: "Networking",
-    description:
-      "Cisco develops networking, cybersecurity, collaboration, and infrastructure technologies used by businesses and governments around the world.",
-    revenue: "$59.8B",
-    revenueGrowth: "+7.6%",
-    operatingMargin: "27.5%",
-    eps: "$3.42",
-    marketCap: "$282B",
-    range: "$54 – $79",
-    chart: [75, 74, 76, 72, 70, 69, 71, 66, 64, 61, 59, 52],
-  },
-  {
-    ticker: "HTZ",
-    name: "Hertz",
-    direction: "loser",
-    change: -8.8,
-    price: "$7.82",
-    sector: "Transportation",
-    description:
-      "Hertz operates vehicle-rental brands serving airport, leisure, and business customers across numerous global markets.",
-    revenue: "$9.1B",
-    revenueGrowth: "-2.8%",
-    operatingMargin: "7.1%",
-    eps: "-$0.48",
-    marketCap: "$2.5B",
-    range: "$4 – $12",
-    chart: [76, 72, 73, 68, 66, 62, 65, 59, 56, 53, 49, 45],
-  },
-  {
-    ticker: "JD",
-    name: "JD.com",
-    direction: "loser",
-    change: -7.2,
-    price: "$31.40",
-    sector: "E-Commerce",
-    description:
-      "JD.com is a major technology and e-commerce company operating online retail, logistics, cloud, and marketplace businesses.",
-    revenue: "$165B",
-    revenueGrowth: "+9.2%",
-    operatingMargin: "4.6%",
-    eps: "$3.18",
-    marketCap: "$48B",
-    range: "$29 – $51",
-    chart: [73, 76, 70, 68, 69, 64, 61, 59, 55, 57, 51, 46],
-  },
-  {
-    ticker: "COHR",
-    name: "Coherent",
-    direction: "loser",
-    change: -7.9,
-    price: "$126.80",
-    sector: "Photonics",
-    description:
-      "Coherent develops lasers, optical networking components, semiconductor materials, and photonics technologies used in communications and industrial systems.",
-    revenue: "$6.2B",
-    revenueGrowth: "+12.8%",
-    operatingMargin: "15.2%",
-    eps: "$4.87",
-    marketCap: "$21B",
-    range: "$79 – $142",
-    chart: [79, 77, 73, 75, 70, 68, 65, 61, 63, 58, 53, 48],
-  },
-];
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 
 const technologies = [
   {
     name: "React",
     url: "https://react.dev/",
-    purpose: "Builds the interactive frontend and reusable application views.",
+    purpose:
+      "Builds the interactive frontend, search interface, and reusable application views.",
   },
   {
     name: "Vite",
     url: "https://vite.dev/",
-    purpose: "Provides the frontend development server and build system.",
+    purpose:
+      "Provides the frontend development server and production build system.",
   },
   {
     name: "FastAPI",
     url: "https://fastapi.tiangolo.com/",
-    purpose: "Provides the Python backend API.",
+    purpose:
+      "Provides the Python backend API used by the React frontend.",
   },
   {
     name: "Uvicorn",
     url: "https://www.uvicorn.org/",
-    purpose: "Runs the FastAPI application locally.",
+    purpose:
+      "Runs the FastAPI backend application during local development.",
+  },
+  {
+    name: "yfinance",
+    url: "https://pypi.org/project/yfinance/",
+    purpose:
+      "Retrieves public market data, company information, historical prices, search results, and market movers from Yahoo Finance.",
+  },
+  {
+    name: "Yahoo Finance",
+    url: "https://finance.yahoo.com/",
+    purpose:
+      "Provides the underlying public financial information accessed through yfinance.",
   },
   {
     name: "python-dotenv",
     url: "https://pypi.org/project/python-dotenv/",
-    purpose: "Keeps backend environment variables outside frontend code.",
+    purpose:
+      "Supports backend environment-variable configuration without placing settings directly in frontend code.",
   },
   {
     name: "React Icons",
     url: "https://react-icons.github.io/react-icons/",
-    purpose: "Provides the Feather icons used throughout the interface.",
+    purpose:
+      "Provides the Feather icons used throughout the user interface.",
   },
   {
     name: "Google Fonts",
     url: "https://fonts.google.com/",
-    purpose: "Provides the Inter font used throughout the interface.",
+    purpose:
+      "Provides the Inter font used throughout the application.",
   },
 ];
 
-function MarketChart({ values, direction = "gainer" }) {
-  const width = 700;
-  const height = 250;
-  const padding = 15;
 
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+function formatMoney(value, currency = "USD") {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(value);
+  } catch {
+    return `$${Number(value).toFixed(2)}`;
+  }
+}
+
+
+function formatLargeNumber(value) {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "N/A";
+  }
+
+  if (Math.abs(number) >= 1_000_000_000_000) {
+    return `$${(number / 1_000_000_000_000).toFixed(2)}T`;
+  }
+
+  if (Math.abs(number) >= 1_000_000_000) {
+    return `$${(number / 1_000_000_000).toFixed(2)}B`;
+  }
+
+  if (Math.abs(number) >= 1_000_000) {
+    return `$${(number / 1_000_000).toFixed(2)}M`;
+  }
+
+  return `$${number.toLocaleString("en-US")}`;
+}
+
+
+function formatPercent(value) {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "N/A";
+  }
+
+  return `${number >= 0 ? "+" : ""}${number.toFixed(2)}%`;
+}
+
+
+function formatPlainNumber(value) {
+  if (value === null || value === undefined) {
+    return "N/A";
+  }
+
+  const number = Number(value);
+
+  if (!Number.isFinite(number)) {
+    return "N/A";
+  }
+
+  return number.toFixed(2);
+}
+
+
+function MarketChart({ chart }) {
+  if (!chart || chart.length < 2) {
+    return (
+      <div className="chart-empty">
+        Historical price data is currently unavailable.
+      </div>
+    );
+  }
+
+  const width = 760;
+  const height = 280;
+  const padding = 18;
+
+  const prices = chart
+    .map((point) => Number(point.close))
+    .filter((price) => Number.isFinite(price));
+
+  if (prices.length < 2) {
+    return (
+      <div className="chart-empty">
+        Historical price data is currently unavailable.
+      </div>
+    );
+  }
+
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
   const range = max - min || 1;
 
-  const points = values
-    .map((value, index) => {
+  const points = chart
+    .map((point, index) => {
+      const price = Number(point.close);
+
+      if (!Number.isFinite(price)) {
+        return null;
+      }
+
       const x =
-        padding + (index / (values.length - 1)) * (width - padding * 2);
+        padding +
+        (index / (chart.length - 1)) *
+          (width - padding * 2);
 
       const y =
         height -
         padding -
-        ((value - min) / range) * (height - padding * 2);
+        ((price - min) / range) *
+          (height - padding * 2);
 
       return `${x},${y}`;
     })
+    .filter(Boolean)
     .join(" ");
 
-  const fillPoints = `${padding},${height} ${points} ${
-    width - padding
-  },${height}`;
+  const firstPrice = prices[0];
+  const lastPrice = prices[prices.length - 1];
+
+  const direction =
+    lastPrice >= firstPrice ? "gainer" : "loser";
+
+  const fillPoints =
+    `${padding},${height} ` +
+    points +
+    ` ${width - padding},${height}`;
+
+  const firstDate = chart[0]?.date || "";
+  const lastDate = chart[chart.length - 1]?.date || "";
 
   return (
-    <svg
-      className={`market-chart ${direction}`}
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label="Illustrative sample price chart using dummy data"
-    >
-      <line x1="0" y1="62" x2="700" y2="62" className="chart-grid" />
-      <line x1="0" y1="125" x2="700" y2="125" className="chart-grid" />
-      <line x1="0" y1="188" x2="700" y2="188" className="chart-grid" />
+    <div className="real-chart-wrapper">
+      <svg
+        className={`market-chart ${direction}`}
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Historical stock price chart"
+      >
+        <line
+          x1="0"
+          y1="70"
+          x2={width}
+          y2="70"
+          className="chart-grid"
+        />
 
-      <polygon points={fillPoints} className="chart-area" />
+        <line
+          x1="0"
+          y1="140"
+          x2={width}
+          y2="140"
+          className="chart-grid"
+        />
 
-      <polyline
-        points={points}
-        className="chart-line"
-        fill="none"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
+        <line
+          x1="0"
+          y1="210"
+          x2={width}
+          y2="210"
+          className="chart-grid"
+        />
+
+        <polygon
+          points={fillPoints}
+          className="chart-area"
+        />
+
+        <polyline
+          points={points}
+          className="chart-line"
+          fill="none"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+
+      <div className="chart-date-row">
+        <span>{firstDate}</span>
+        <span>{lastDate}</span>
+      </div>
+    </div>
   );
 }
 
+
+function AboutToolSection() {
+  return (
+    <section className="purpose-section">
+      <div className="section-heading">
+        <div>
+          <span className="section-label">
+            ABOUT THE TOOL
+          </span>
+
+          <h2>
+            Research a company without the clutter.
+          </h2>
+
+          <p>
+            TickerBrief combines public financial data with
+            a simple interface designed to help users quickly
+            understand a company's recent market performance.
+          </p>
+        </div>
+      </div>
+
+      <div className="purpose-grid">
+        <article>
+          <FiSearch aria-hidden="true" />
+
+          <h3>Find companies</h3>
+
+          <p>
+            Search publicly traded companies by ticker or
+            company name using results retrieved through the
+            backend financial-data service.
+          </p>
+        </article>
+
+        <article>
+          <FiBarChart2 aria-hidden="true" />
+
+          <h3>Review real data</h3>
+
+          <p>
+            View recent prices, historical charts, market
+            capitalization, revenue, margins, earnings, and
+            other company information.
+          </p>
+        </article>
+
+        <article>
+          <FiShield aria-hidden="true" />
+
+          <h3>Learn responsibly</h3>
+
+          <p>
+            TickerBrief AI is an educational project and does
+            not provide investment recommendations or
+            financial advice.
+          </p>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+
 function HomePage({ openCompany }) {
-  const [ticker, setTicker] = useState("");
-  const [searchError, setSearchError] = useState("");
-  const [searchFocused, setSearchFocused] = useState(false);
-  const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchFocused, setSearchFocused] =
+    useState(false);
+  const [searchLoading, setSearchLoading] =
+    useState(false);
+  const [searchError, setSearchError] =
+    useState("");
 
-  const gainers = companies.filter(
-    (company) => company.direction === "gainer"
-  );
+  const [gainers, setGainers] = useState([]);
+  const [losers, setLosers] = useState([]);
+  const [moversLoading, setMoversLoading] =
+    useState(true);
+  const [moversError, setMoversError] =
+    useState("");
 
-  const losers = companies.filter(
-    (company) => company.direction === "loser"
-  );
 
-  const filteredCompanies = useMemo(() => {
-    const query = ticker.trim().toUpperCase();
+  useEffect(() => {
+    let cancelled = false;
 
-    const matches = companies.filter((company) => {
-      if (!query) {
-        return true;
+    async function loadMovers() {
+      setMoversLoading(true);
+      setMoversError("");
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/movers`
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Market movers could not be loaded."
+          );
+        }
+
+        const data = await response.json();
+
+        if (!cancelled) {
+          setGainers(data.gainers || []);
+          setLosers(data.losers || []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error(error);
+
+          setMoversError(
+            "Current market movers are temporarily unavailable."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setMoversLoading(false);
+        }
       }
+    }
 
-      return (
-        company.ticker.toUpperCase().includes(query) ||
-        company.name.toUpperCase().includes(query)
-      );
-    });
+    loadMovers();
 
-    return matches.sort((a, b) => {
-      if (!query) {
-        return a.name.localeCompare(b.name);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const query = searchTerm.trim();
+
+    if (!query) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      setSearchError("");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(async () => {
+      setSearchLoading(true);
+      setSearchError("");
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/search?q=${encodeURIComponent(
+            query
+          )}`,
+          {
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Company search could not be completed."
+          );
+        }
+
+        const data = await response.json();
+
+        setSearchResults(data.results || []);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error(error);
+
+          setSearchResults([]);
+
+          setSearchError(
+            "Company search is temporarily unavailable."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setSearchLoading(false);
+        }
       }
+    }, 300);
 
-      const aTicker = a.ticker.toUpperCase();
-      const bTicker = b.ticker.toUpperCase();
-      const aName = a.name.toUpperCase();
-      const bName = b.name.toUpperCase();
+    return () => {
+      clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [searchTerm]);
 
-      const aExactTicker = aTicker === query;
-      const bExactTicker = bTicker === query;
 
-      if (aExactTicker && !bExactTicker) return -1;
-      if (bExactTicker && !aExactTicker) return 1;
+  const featuredMover =
+    gainers.length > 0
+      ? gainers[0]
+      : losers.length > 0
+      ? losers[0]
+      : null;
 
-      const aTickerStarts = aTicker.startsWith(query);
-      const bTickerStarts = bTicker.startsWith(query);
 
-      if (aTickerStarts && !bTickerStarts) return -1;
-      if (bTickerStarts && !aTickerStarts) return 1;
-
-      const aNameStarts = aName.startsWith(query);
-      const bNameStarts = bName.startsWith(query);
-
-      if (aNameStarts && !bNameStarts) return -1;
-      if (bNameStarts && !aNameStarts) return 1;
-
-      return a.name.localeCompare(b.name);
-    });
-  }, [ticker]);
-
-  function chooseCompany(company) {
-    setTicker(company.ticker);
-    setSearchError("");
-    setSearchFocused(false);
-    setActiveSuggestion(-1);
-    openCompany(company);
-  }
-
-  function searchTicker(event) {
-    event.preventDefault();
-
-    const cleaned = ticker.trim().toUpperCase();
-
-    const exactMatch = companies.find(
-      (company) =>
-        company.ticker.toUpperCase() === cleaned ||
-        company.name.toUpperCase() === cleaned
+  function selectCompany(company) {
+    setSearchTerm(
+      `${company.name} (${company.symbol})`
     );
 
-    if (exactMatch) {
-      chooseCompany(exactMatch);
+    setSearchFocused(false);
+    setSearchResults([]);
+    setSearchError("");
+
+    openCompany(company.symbol);
+  }
+
+
+  function submitSearch(event) {
+    event.preventDefault();
+
+    if (searchResults.length > 0) {
+      selectCompany(searchResults[0]);
       return;
     }
 
-    if (filteredCompanies.length === 1) {
-      chooseCompany(filteredCompanies[0]);
-      return;
-    }
+    const possibleTicker = searchTerm
+      .trim()
+      .toUpperCase();
 
-    if (!cleaned) {
-      setSearchError("Start typing a company name or ticker.");
-      setSearchFocused(true);
+    if (
+      /^[A-Z0-9][A-Z0-9.\-]{0,14}$/.test(
+        possibleTicker
+      )
+    ) {
+      openCompany(possibleTicker);
       return;
     }
 
     setSearchError(
-      "Choose a company from the dropdown suggestions."
+      "Select a company from the search suggestions."
     );
-    setSearchFocused(true);
   }
 
-  function handleSearchKeyDown(event) {
-    if (!searchFocused || filteredCompanies.length === 0) {
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-
-      setActiveSuggestion((current) =>
-        current < filteredCompanies.length - 1
-          ? current + 1
-          : 0
-      );
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-
-      setActiveSuggestion((current) =>
-        current > 0
-          ? current - 1
-          : filteredCompanies.length - 1
-      );
-    }
-
-    if (event.key === "Enter" && activeSuggestion >= 0) {
-      event.preventDefault();
-
-      chooseCompany(filteredCompanies[activeSuggestion]);
-    }
-
-    if (event.key === "Escape") {
-      setSearchFocused(false);
-      setActiveSuggestion(-1);
-    }
-  }
 
   return (
     <main id="main-content">
@@ -422,150 +516,20 @@ function HomePage({ openCompany }) {
         <div className="hero-copy">
           <span className="eyebrow">
             <FiActivity aria-hidden="true" />
-            Market insights
+            Real market data, simplified
           </span>
 
           <h1>Ticker Brief Generator</h1>
 
           <p className="hero-summary">
-            Get quick insights into the fastest growing companies.
+            Get quick insights into the fastest growing
+            companies.
           </p>
-
-          <form className="hero-search" onSubmit={searchTicker}>
-            <label htmlFor="ticker-search">
-              Search for a company
-            </label>
-
-            <div className="search-row">
-              <div className="autocomplete">
-                <div className="search-input">
-                  <FiSearch aria-hidden="true" />
-
-                  <input
-                    id="ticker-search"
-                    type="text"
-                    placeholder="Search ticker or company..."
-                    value={ticker}
-                    autoComplete="off"
-                    role="combobox"
-                    aria-autocomplete="list"
-                    aria-expanded={
-                      searchFocused &&
-                      filteredCompanies.length > 0
-                    }
-                    aria-controls="company-suggestions"
-                    aria-activedescendant={
-                      activeSuggestion >= 0
-                        ? `company-suggestion-${activeSuggestion}`
-                        : undefined
-                    }
-                    onFocus={() => {
-                      setSearchFocused(true);
-                      setActiveSuggestion(-1);
-                    }}
-                    onChange={(event) => {
-                      setTicker(event.target.value);
-                      setSearchError("");
-                      setSearchFocused(true);
-                      setActiveSuggestion(-1);
-                    }}
-                    onKeyDown={handleSearchKeyDown}
-                  />
-                </div>
-
-                {searchFocused &&
-                  filteredCompanies.length > 0 && (
-                    <div
-                      id="company-suggestions"
-                      className="search-dropdown"
-                      role="listbox"
-                    >
-                      {filteredCompanies.map(
-                        (company, index) => (
-                          <button
-                            id={`company-suggestion-${index}`}
-                            type="button"
-                            role="option"
-                            aria-selected={
-                              activeSuggestion === index
-                            }
-                            className={
-                              activeSuggestion === index
-                                ? "search-suggestion active"
-                                : "search-suggestion"
-                            }
-                            key={company.ticker}
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              chooseCompany(company);
-                            }}
-                            onMouseEnter={() =>
-                              setActiveSuggestion(index)
-                            }
-                          >
-                            <span className="suggestion-symbol">
-                              {company.ticker.slice(0, 2)}
-                            </span>
-
-                            <span className="suggestion-company">
-                              <strong>{company.name}</strong>
-
-                              <small>
-                                {company.ticker} ·{" "}
-                                {company.sector}
-                              </small>
-                            </span>
-
-                            <span
-                              className={
-                                company.change >= 0
-                                  ? "suggestion-change positive"
-                                  : "suggestion-change negative"
-                              }
-                            >
-                              {company.change >= 0 ? "+" : ""}
-                              {company.change.toFixed(1)}%
-                            </span>
-                          </button>
-                        )
-                      )}
-                    </div>
-                  )}
-
-                {searchFocused &&
-                  ticker.trim() &&
-                  filteredCompanies.length === 0 && (
-                    <div className="search-dropdown empty-dropdown">
-                      No companies match "{ticker}".
-                    </div>
-                  )}
-              </div>
-
-              <button type="submit" className="primary-button">
-                Generate Brief
-                <FiArrowRight aria-hidden="true" />
-              </button>
-            </div>
-
-            <span
-              id="ticker-search-help"
-              className="search-help"
-            >
-              Search by company name or ticker. Suggestions narrow
-              automatically as you type.
-            </span>
-
-            {searchError && (
-              <p className="search-error" role="alert">
-                {searchError}
-              </p>
-            )}
-          </form>
 
           <div className="hero-tags">
             <span>
               <FiBarChart2 aria-hidden="true" />
-              Market data
+              Real market data
             </span>
 
             <span>
@@ -580,64 +544,261 @@ function HomePage({ openCompany }) {
           </div>
         </div>
 
-        <div className="prototype-card">
-          <div className="prototype-top">
+        <div className="live-snapshot-card">
+          <div className="snapshot-heading">
             <div>
               <span className="section-label">
-                SAMPLE BRIEF
+                LIVE MARKET SNAPSHOT
               </span>
 
-              <h2>NVIDIA</h2>
+              <h2>
+                {featuredMover
+                  ? featuredMover.name
+                  : "Market data"}
+              </h2>
 
               <span className="ticker-text">
-                NASDAQ: NVDA
+                {featuredMover
+                  ? featuredMover.symbol
+                  : "Yahoo Finance via yfinance"}
               </span>
             </div>
 
-            <span className="sample-badge">
-              Sample data
+            <span className="live-badge">
+              Live data
             </span>
           </div>
 
-          <div className="prototype-price">
-            <strong>$226.80</strong>
-
-            <span>
-              <FiTrendingUp aria-hidden="true" />
-              +0.7%
-            </span>
-          </div>
-
-          <MarketChart
-            values={[
-              45, 48, 47, 53, 51, 58, 57, 63, 67, 66, 72,
-              78,
-            ]}
-            direction="gainer"
-          />
-
-          <div className="prototype-stats">
-            <div>
-              <span>30 Day</span>
-              <strong>+6.8%</strong>
+          {moversLoading && (
+            <div className="snapshot-loading">
+              Loading current market data...
             </div>
+          )}
 
-            <div>
-              <span>Market Cap</span>
-              <strong>$5.5T</strong>
-            </div>
+          {!moversLoading &&
+            featuredMover && (
+              <>
+                <div className="snapshot-price">
+                  <strong>
+                    {formatMoney(
+                      featuredMover.price
+                    )}
+                  </strong>
 
-            <div>
-              <span>Sentiment</span>
-              <strong>Positive</strong>
-            </div>
-          </div>
+                  <span
+                    className={
+                      featuredMover.change_percent >= 0
+                        ? "positive"
+                        : "negative"
+                    }
+                  >
+                    {featuredMover.change_percent >=
+                    0 ? (
+                      <FiTrendingUp
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <FiTrendingDown
+                        aria-hidden="true"
+                      />
+                    )}
 
-          <p className="sample-disclaimer">
-            Demonstration values only. This card does not
-            display live market data.
+                    {formatPercent(
+                      featuredMover.change_percent
+                    )}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="snapshot-button"
+                  onClick={() =>
+                    openCompany(
+                      featuredMover.symbol
+                    )
+                  }
+                >
+                  View company brief
+                  <FiArrowRight
+                    aria-hidden="true"
+                  />
+                </button>
+              </>
+            )}
+
+          {!moversLoading &&
+            !featuredMover && (
+              <p className="snapshot-error">
+                {moversError ||
+                  "Market information is currently unavailable."}
+              </p>
+            )}
+
+          <p className="snapshot-source">
+            Data source: Yahoo Finance via yfinance
           </p>
         </div>
+      </section>
+
+      <AboutToolSection />
+
+      <section className="search-section">
+        <div className="section-heading">
+          <div>
+            <span className="section-label">
+              COMPANY SEARCH
+            </span>
+
+            <h2>Generate a company brief</h2>
+
+            <p>
+              Search by company name or ticker symbol.
+              Results are retrieved from the backend financial
+              data source rather than a hard-coded company list.
+            </p>
+          </div>
+        </div>
+
+        <form
+          className="company-search-form"
+          onSubmit={submitSearch}
+        >
+          <label htmlFor="ticker-search">
+            Search publicly traded companies
+          </label>
+
+          <div className="search-row">
+            <div className="autocomplete">
+              <div className="search-input">
+                <FiSearch aria-hidden="true" />
+
+                <input
+                  id="ticker-search"
+                  type="text"
+                  placeholder="Try Apple, Microsoft, NVDA..."
+                  value={searchTerm}
+                  autoComplete="off"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={
+                    searchFocused &&
+                    (searchLoading ||
+                      searchResults.length > 0)
+                  }
+                  aria-controls="company-suggestions"
+                  onFocus={() =>
+                    setSearchFocused(true)
+                  }
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setSearchFocused(false);
+                    }, 150);
+                  }}
+                  onChange={(event) => {
+                    setSearchTerm(
+                      event.target.value
+                    );
+
+                    setSearchFocused(true);
+                    setSearchError("");
+                  }}
+                />
+              </div>
+
+              {searchFocused &&
+                searchTerm.trim() && (
+                  <div
+                    id="company-suggestions"
+                    className="search-dropdown"
+                    role="listbox"
+                  >
+                    {searchLoading && (
+                      <div className="search-status">
+                        Searching companies...
+                      </div>
+                    )}
+
+                    {!searchLoading &&
+                      searchResults.map(
+                        (company) => (
+                          <button
+                            type="button"
+                            role="option"
+                            className="search-suggestion"
+                            key={`${company.symbol}-${company.exchange}`}
+                            onMouseDown={(
+                              event
+                            ) => {
+                              event.preventDefault();
+
+                              selectCompany(
+                                company
+                              );
+                            }}
+                          >
+                            <span className="suggestion-symbol">
+                              {company.symbol
+                                .slice(0, 2)
+                                .toUpperCase()}
+                            </span>
+
+                            <span className="suggestion-company">
+                              <strong>
+                                {company.name}
+                              </strong>
+
+                              <small>
+                                {company.symbol}
+                                {company.exchange
+                                  ? ` · ${company.exchange}`
+                                  : ""}
+                              </small>
+                            </span>
+
+                            <FiArrowRight
+                              className="suggestion-arrow"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        )
+                      )}
+
+                    {!searchLoading &&
+                      searchResults.length ===
+                        0 &&
+                      !searchError && (
+                        <div className="search-status">
+                          No matching companies
+                          found.
+                        </div>
+                      )}
+                  </div>
+                )}
+            </div>
+
+            <button
+              type="submit"
+              className="primary-button"
+            >
+              Generate Brief
+              <FiArrowRight aria-hidden="true" />
+            </button>
+          </div>
+
+          <span className="search-help">
+            Search results are retrieved from Yahoo
+            Finance through the FastAPI backend.
+          </span>
+
+          {searchError && (
+            <p
+              className="search-error"
+              role="alert"
+            >
+              {searchError}
+            </p>
+          )}
+        </form>
       </section>
 
       <section className="movers-section">
@@ -650,168 +811,255 @@ function HomePage({ openCompany }) {
             <h2>Today's Market Movers</h2>
 
             <p>
-              Explore five notable gainers and losers. Select a
-              company to view its expanded sample market brief.
+              Current gainers and losers retrieved through
+              the project's financial-data integration.
+              Select any company to open its detailed brief.
             </p>
           </div>
 
-          <span className="demo-label">Sample data</span>
+          <span className="live-data-label">
+            Live market data
+          </span>
         </div>
 
-        <div className="mover-columns">
-          <div className="mover-group">
-            <div className="mover-heading gain">
-              <span className="mover-icon">
-                <FiTrendingUp aria-hidden="true" />
-              </span>
+        {moversLoading && (
+          <div className="loading-panel">
+            Loading current market movers...
+          </div>
+        )}
 
-              <div>
-                <span>Top 5</span>
-                <h3>Gainers</h3>
+        {moversError &&
+          !moversLoading && (
+            <div className="error-panel">
+              {moversError}
+            </div>
+          )}
+
+        {!moversLoading &&
+          !moversError && (
+            <div className="mover-columns">
+              <div className="mover-group">
+                <div className="mover-heading gain">
+                  <span className="mover-icon">
+                    <FiTrendingUp
+                      aria-hidden="true"
+                    />
+                  </span>
+
+                  <div>
+                    <span>Top 5</span>
+                    <h3>Gainers</h3>
+                  </div>
+                </div>
+
+                <div className="mover-list">
+                  {gainers.map(
+                    (company, index) => (
+                      <button
+                        type="button"
+                        className="mover-row"
+                        key={company.symbol}
+                        onClick={() =>
+                          openCompany(
+                            company.symbol
+                          )
+                        }
+                      >
+                        <span className="mover-rank">
+                          {index + 1}
+                        </span>
+
+                        <span className="mover-company">
+                          <strong>
+                            {company.symbol}
+                          </strong>
+
+                          <small>
+                            {company.name}
+                          </small>
+                        </span>
+
+                        <span className="mover-price">
+                          {formatMoney(
+                            company.price
+                          )}
+                        </span>
+
+                        <span className="mover-change positive">
+                          {formatPercent(
+                            company.change_percent
+                          )}
+                        </span>
+
+                        <FiArrowRight
+                          className="row-arrow"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div className="mover-group">
+                <div className="mover-heading loss">
+                  <span className="mover-icon">
+                    <FiTrendingDown
+                      aria-hidden="true"
+                    />
+                  </span>
+
+                  <div>
+                    <span>Top 5</span>
+                    <h3>Losers</h3>
+                  </div>
+                </div>
+
+                <div className="mover-list">
+                  {losers.map(
+                    (company, index) => (
+                      <button
+                        type="button"
+                        className="mover-row"
+                        key={company.symbol}
+                        onClick={() =>
+                          openCompany(
+                            company.symbol
+                          )
+                        }
+                      >
+                        <span className="mover-rank">
+                          {index + 1}
+                        </span>
+
+                        <span className="mover-company">
+                          <strong>
+                            {company.symbol}
+                          </strong>
+
+                          <small>
+                            {company.name}
+                          </small>
+                        </span>
+
+                        <span className="mover-price">
+                          {formatMoney(
+                            company.price
+                          )}
+                        </span>
+
+                        <span className="mover-change negative">
+                          {formatPercent(
+                            company.change_percent
+                          )}
+                        </span>
+
+                        <FiArrowRight
+                          className="row-arrow"
+                          aria-hidden="true"
+                        />
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
             </div>
-
-            <div className="mover-list">
-              {gainers.map((company, index) => (
-                <button
-                  type="button"
-                  className="mover-row"
-                  key={company.ticker}
-                  onClick={() => openCompany(company)}
-                >
-                  <span className="mover-rank">
-                    {index + 1}
-                  </span>
-
-                  <span className="mover-company">
-                    <strong>{company.ticker}</strong>
-                    <small>{company.name}</small>
-                  </span>
-
-                  <span className="mover-price">
-                    {company.price}
-                  </span>
-
-                  <span className="mover-change positive">
-                    +{company.change.toFixed(1)}%
-                  </span>
-
-                  <FiArrowRight
-                    className="row-arrow"
-                    aria-hidden="true"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mover-group">
-            <div className="mover-heading loss">
-              <span className="mover-icon">
-                <FiTrendingDown aria-hidden="true" />
-              </span>
-
-              <div>
-                <span>Top 5</span>
-                <h3>Losers</h3>
-              </div>
-            </div>
-
-            <div className="mover-list">
-              {losers.map((company, index) => (
-                <button
-                  type="button"
-                  className="mover-row"
-                  key={company.ticker}
-                  onClick={() => openCompany(company)}
-                >
-                  <span className="mover-rank">
-                    {index + 1}
-                  </span>
-
-                  <span className="mover-company">
-                    <strong>{company.ticker}</strong>
-                    <small>{company.name}</small>
-                  </span>
-
-                  <span className="mover-price">
-                    {company.price}
-                  </span>
-
-                  <span className="mover-change negative">
-                    {company.change.toFixed(1)}%
-                  </span>
-
-                  <FiArrowRight
-                    className="row-arrow"
-                    aria-hidden="true"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+          )}
 
         <p className="market-note">
-          Market-mover names were chosen to resemble current
-          market direction, but all displayed prices,
-          percentages, financial figures, and charts in this
-          prototype should be treated as illustrative sample
-          data.
+          Financial information is retrieved from Yahoo
+          Finance through the open-source yfinance package.
+          Market data may be delayed and is provided for
+          educational use only.
         </p>
-      </section>
-
-      <section className="purpose-section">
-        <span className="section-label">
-          ABOUT THE TOOL
-        </span>
-
-        <h2>Research any company.</h2>
-
-        <div className="purpose-grid">
-          <article>
-            <FiSearch aria-hidden="true" />
-
-            <h3>Find companies</h3>
-
-            <p>
-              Search by ticker or discover companies through
-              the daily market-movers dashboard.
-            </p>
-          </article>
-
-          <article>
-            <FiBarChart2 aria-hidden="true" />
-
-            <h3>Review performance</h3>
-
-            <p>
-              Company pages organize performance, financial
-              metrics, charts, and background information.
-            </p>
-          </article>
-
-          <article>
-            <FiShield aria-hidden="true" />
-
-            <h3>Learn responsibly</h3>
-
-            <p>
-              TickerBrief AI is an educational project and does
-              not provide financial advice or price predictions.
-            </p>
-          </article>
-        </div>
       </section>
     </main>
   );
 }
 
-function CompanyPage({ company, goHome }) {
-  const positive = company.direction === "gainer";
+
+function CompanyPage({
+  company,
+  loading,
+  error,
+  goHome,
+}) {
+  if (loading) {
+    return (
+      <main
+        id="main-content"
+        className="company-page"
+      >
+        <div className="company-container">
+          <button
+            type="button"
+            className="back-button"
+            onClick={goHome}
+          >
+            <FiArrowLeft aria-hidden="true" />
+            Back to Homepage
+          </button>
+
+          <div className="company-loading">
+            <FiActivity aria-hidden="true" />
+
+            <h1>Loading company brief...</h1>
+
+            <p>
+              Retrieving current market and financial
+              information.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+
+  if (error || !company) {
+    return (
+      <main
+        id="main-content"
+        className="company-page"
+      >
+        <div className="company-container">
+          <button
+            type="button"
+            className="back-button"
+            onClick={goHome}
+          >
+            <FiArrowLeft aria-hidden="true" />
+            Back to Homepage
+          </button>
+
+          <div className="company-error">
+            <FiInfo aria-hidden="true" />
+
+            <h1>Company data unavailable</h1>
+
+            <p>
+              {error ||
+                "TickerBrief could not load this company."}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+
+  const positive =
+    company.day_change_percent === null ||
+    company.day_change_percent === undefined
+      ? true
+      : company.day_change_percent >= 0;
+
 
   return (
-    <main id="main-content" className="company-page">
+    <main
+      id="main-content"
+      className="company-page"
+    >
       <div className="company-container">
         <button
           type="button"
@@ -819,7 +1067,7 @@ function CompanyPage({ company, goHome }) {
           onClick={goHome}
         >
           <FiArrowLeft aria-hidden="true" />
-          Back to Market Movers
+          Back to Homepage
         </button>
 
         <div className="company-hero">
@@ -830,23 +1078,31 @@ function CompanyPage({ company, goHome }) {
 
             <div className="company-title-row">
               <div className="company-logo">
-                {company.ticker.slice(0, 2)}
+                {company.symbol
+                  .slice(0, 2)
+                  .toUpperCase()}
               </div>
 
               <div>
                 <h1>{company.name}</h1>
 
                 <p>
-                  {company.ticker} · {company.sector}
+                  {company.symbol} ·{" "}
+                  {company.exchange}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="company-quote">
-            <span>Sample price</span>
+            <span>Recent market price</span>
 
-            <strong>{company.price}</strong>
+            <strong>
+              {formatMoney(
+                company.price,
+                company.currency
+              )}
+            </strong>
 
             <span
               className={
@@ -856,15 +1112,69 @@ function CompanyPage({ company, goHome }) {
               }
             >
               {positive ? (
-                <FiTrendingUp aria-hidden="true" />
+                <FiTrendingUp
+                  aria-hidden="true"
+                />
               ) : (
-                <FiTrendingDown aria-hidden="true" />
+                <FiTrendingDown
+                  aria-hidden="true"
+                />
               )}
 
-              {positive ? "+" : ""}
-              {company.change.toFixed(1)}%
+              {formatPercent(
+                company.day_change_percent
+              )}
             </span>
           </div>
+        </div>
+
+        <div className="performance-grid">
+          <article>
+            <span>1 Month</span>
+            <strong
+              className={
+                company.month_return_percent >=
+                0
+                  ? "positive"
+                  : "negative"
+              }
+            >
+              {formatPercent(
+                company.month_return_percent
+              )}
+            </strong>
+          </article>
+
+          <article>
+            <span>3 Months</span>
+            <strong
+              className={
+                company.three_month_return_percent >=
+                0
+                  ? "positive"
+                  : "negative"
+              }
+            >
+              {formatPercent(
+                company.three_month_return_percent
+              )}
+            </strong>
+          </article>
+
+          <article>
+            <span>1 Year</span>
+            <strong
+              className={
+                company.year_return_percent >= 0
+                  ? "positive"
+                  : "negative"
+              }
+            >
+              {formatPercent(
+                company.year_return_percent
+              )}
+            </strong>
+          </article>
         </div>
 
         <div className="detail-grid">
@@ -872,29 +1182,20 @@ function CompanyPage({ company, goHome }) {
             <div className="card-heading">
               <div>
                 <span className="section-label">
-                  RECENT PERFORMANCE
+                  REAL PRICE HISTORY
                 </span>
 
-                <h2>Price Trend</h2>
+                <h2>1-Year Price Trend</h2>
               </div>
 
-              <span className="sample-badge">
-                Illustrative
+              <span className="live-data-label">
+                Yahoo Finance
               </span>
             </div>
 
             <MarketChart
-              values={company.chart}
-              direction={company.direction}
+              chart={company.chart}
             />
-
-            <div className="chart-timeframe">
-              <span>1D</span>
-              <span>1W</span>
-              <span className="selected">1M</span>
-              <span>3M</span>
-              <span>1Y</span>
-            </div>
           </section>
 
           <aside className="company-summary-card">
@@ -909,19 +1210,57 @@ function CompanyPage({ company, goHome }) {
             <div className="overview-items">
               <div>
                 <span>Sector</span>
-                <strong>{company.sector}</strong>
+                <strong>
+                  {company.sector}
+                </strong>
+              </div>
+
+              <div>
+                <span>Industry</span>
+                <strong>
+                  {company.industry}
+                </strong>
               </div>
 
               <div>
                 <span>Market Cap</span>
-                <strong>{company.marketCap}</strong>
+                <strong>
+                  {formatLargeNumber(
+                    company.market_cap
+                  )}
+                </strong>
               </div>
 
               <div>
                 <span>52-Week Range</span>
-                <strong>{company.range}</strong>
+                <strong>
+                  {formatMoney(
+                    company.fifty_two_week_low,
+                    company.currency
+                  )}{" "}
+                  –{" "}
+                  {formatMoney(
+                    company.fifty_two_week_high,
+                    company.currency
+                  )}
+                </strong>
               </div>
             </div>
+
+            {company.website && (
+              <a
+                className="company-website"
+                href={company.website}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <FiGlobe aria-hidden="true" />
+                Company website
+                <FiExternalLink
+                  aria-hidden="true"
+                />
+              </a>
+            )}
           </aside>
         </div>
 
@@ -929,76 +1268,188 @@ function CompanyPage({ company, goHome }) {
           <div className="section-heading">
             <div>
               <span className="section-label">
-                RECENT FINANCIALS
+                FINANCIAL DATA
               </span>
 
               <h2>Financial Snapshot</h2>
 
               <p>
-                Illustrative values used to demonstrate the
-                intended TickerBrief company-page layout.
+                Current company fundamentals retrieved through
+                the project's Yahoo Finance data integration.
               </p>
             </div>
           </div>
 
           <div className="financial-grid">
             <article>
-              <FiDollarSign aria-hidden="true" />
+              <FiDollarSign
+                aria-hidden="true"
+              />
 
               <span>Revenue</span>
-              <strong>{company.revenue}</strong>
-              <small>Sample trailing revenue</small>
+
+              <strong>
+                {formatLargeNumber(
+                  company.revenue
+                )}
+              </strong>
+
+              <small>
+                Reported total revenue
+              </small>
             </article>
 
             <article>
-              <FiTrendingUp aria-hidden="true" />
+              <FiTrendingUp
+                aria-hidden="true"
+              />
 
               <span>Revenue Growth</span>
-              <strong>{company.revenueGrowth}</strong>
-              <small>Sample year-over-year</small>
+
+              <strong>
+                {formatPercent(
+                  company.revenue_growth_percent
+                )}
+              </strong>
+
+              <small>
+                Reported revenue growth
+              </small>
             </article>
 
             <article>
-              <FiActivity aria-hidden="true" />
+              <FiActivity
+                aria-hidden="true"
+              />
 
               <span>Operating Margin</span>
-              <strong>{company.operatingMargin}</strong>
-              <small>Sample operating result</small>
+
+              <strong>
+                {formatPercent(
+                  company.operating_margin_percent
+                )}
+              </strong>
+
+              <small>
+                Reported operating margin
+              </small>
             </article>
 
             <article>
-              <FiBarChart2 aria-hidden="true" />
+              <FiBarChart2
+                aria-hidden="true"
+              />
 
-              <span>EPS</span>
-              <strong>{company.eps}</strong>
-              <small>Sample earnings per share</small>
+              <span>Trailing EPS</span>
+
+              <strong>
+                {formatPlainNumber(
+                  company.trailing_eps
+                )}
+              </strong>
+
+              <small>
+                Earnings per share
+              </small>
+            </article>
+          </div>
+
+          <div className="secondary-financial-grid">
+            <article>
+              <span>Profit Margin</span>
+
+              <strong>
+                {formatPercent(
+                  company.profit_margin_percent
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Trailing P/E</span>
+
+              <strong>
+                {formatPlainNumber(
+                  company.trailing_pe
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Forward P/E</span>
+
+              <strong>
+                {formatPlainNumber(
+                  company.forward_pe
+                )}
+              </strong>
+            </article>
+
+            <article>
+              <span>Forward EPS</span>
+
+              <strong>
+                {formatPlainNumber(
+                  company.forward_eps
+                )}
+              </strong>
             </article>
           </div>
         </section>
 
-        <section className="insight-card">
+        <section className="data-source-card">
           <div className="insight-icon">
+            <FiInfo aria-hidden="true" />
+          </div>
+
+          <div>
+            <span className="section-label">
+              DATA SOURCE
+            </span>
+
+            <h2>
+              Real financial information
+            </h2>
+
+            <p>
+              This company page retrieves its price
+              history and financial information from
+              Yahoo Finance through the yfinance Python
+              package. Values may be delayed or unavailable
+              for some securities.
+            </p>
+
+            <div className="education-warning">
+              <FiShield aria-hidden="true" />
+
+              Educational information only. This is not
+              financial advice or an investment
+              recommendation.
+            </div>
+          </div>
+        </section>
+
+        <section className="ai-status-card">
+          <div className="insight-icon muted-icon">
             <FiActivity aria-hidden="true" />
           </div>
 
           <div>
             <span className="section-label">
-              SAMPLE AI INSIGHT
+              AI SUMMARY STATUS
             </span>
 
-            <h2>What could be driving the move?</h2>
+            <h2>
+              AI-generated summaries are not enabled yet
+            </h2>
 
             <p>
-              {positive
-                ? `${company.name} is shown as a positive market mover in this prototype. A production version of TickerBrief AI would combine recent price data, company financials, earnings information, and market context before generating an educational explanation of the movement.`
-                : `${company.name} is shown as a negative market mover in this prototype. A production version of TickerBrief AI would examine recent price activity, earnings results, company guidance, financial performance, and broader market context before explaining the decline.`}
+              The current version uses real financial data,
+              but an external LLM has not yet been connected.
+              This section is intentionally labeled so the
+              application does not claim that rule-based or
+              static text is AI-generated.
             </p>
-
-            <div className="education-warning">
-              <FiShield aria-hidden="true" />
-              Educational example only. This is not financial
-              advice and is not an investment recommendation.
-            </div>
           </div>
         </section>
 
@@ -1015,9 +1466,13 @@ function CompanyPage({ company, goHome }) {
   );
 }
 
+
 function AboutPage() {
   return (
-    <main id="main-content" className="about-page">
+    <main
+      id="main-content"
+      className="about-page"
+    >
       <section className="about-intro">
         <span className="eyebrow">
           <FiInfo aria-hidden="true" />
@@ -1027,10 +1482,11 @@ function AboutPage() {
         <h1>Technology and Credits</h1>
 
         <p>
-          TickerBrief AI is a class project designed to combine
-          a modern React interface with a Python backend, market
-          data, financial calculations, database concepts, and
-          future LLM-generated educational market explanations.
+          TickerBrief AI is a class project combining a
+          React frontend with a FastAPI backend and public
+          market information. The application currently
+          retrieves real financial information through
+          yfinance and Yahoo Finance.
         </p>
       </section>
 
@@ -1041,66 +1497,156 @@ function AboutPage() {
               TECHNOLOGIES
             </span>
 
-            <h2>Packages and methods used</h2>
+            <h2>
+              Packages and methods used
+            </h2>
 
             <p>
-              Third-party technologies used by the project are
-              credited and linked below.
+              Third-party technologies and data sources
+              used by the project are credited and linked
+              below.
             </p>
           </div>
         </div>
 
         <div className="technology-grid">
-          {technologies.map((technology) => (
-            <article
-              className="technology-card"
-              key={technology.name}
-            >
-              <div>
-                <h3>{technology.name}</h3>
-                <p>{technology.purpose}</p>
-              </div>
-
-              <a
-                href={technology.url}
-                target="_blank"
-                rel="noreferrer"
+          {technologies.map(
+            (technology) => (
+              <article
+                className="technology-card"
+                key={technology.name}
               >
-                Visit site
-                <FiExternalLink aria-hidden="true" />
-              </a>
-            </article>
-          ))}
+                <div>
+                  <h3>
+                    {technology.name}
+                  </h3>
+
+                  <p>
+                    {technology.purpose}
+                  </p>
+                </div>
+
+                <a
+                  href={technology.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit site
+                  <FiExternalLink
+                    aria-hidden="true"
+                  />
+                </a>
+              </article>
+            )
+          )}
         </div>
       </section>
 
       <section className="credits-note">
-        <h2>Design and artwork credits</h2>
+        <h2>
+          Design and development credits
+        </h2>
 
         <p>
-          Charts and visual illustrations used in this prototype
-          are original SVG and CSS interface elements created
-          specifically for TickerBrief AI and do not represent
-          live financial information.
+          OpenAI ChatGPT provided assistance with the
+          dashboard layout,  accessibility styling, formatting 
+          , and frontend component organization.
+          The  implementation, project decisions,
+           by Caden Smith.
         </p>
 
         <p>
-          The original interface concept and portions of frontend
-          development assistance were created with OpenAI
-          ChatGPT. And CSS Formatting was also helped created by ChatGPT.
+          The CSS source file also contains an explicit
+          comment citing ChatGPT's design assistance, as
+          requested for the course project help.
+
+        <p>
+          Financial information is retrieved from Yahoo
+          Finance through the open-source yfinance Python
+          package. Market information may be delayed and
+          should be used for educational purposes only.
+        </p>
+
+        <p>
+          An external LLM is not currently enabled as I didn't have the funds for it, so the
+          present version does not claim that its company
+          descriptions or summaries are AI-generated.
         </p>
       </section>
     </main>
   );
 }
 
+
 function App() {
   const [page, setPage] = useState("home");
-  const [selectedCompany, setSelectedCompany] = useState(null);
+
+  const [selectedCompany, setSelectedCompany] =
+    useState(null);
+
+  const [companyLoading, setCompanyLoading] =
+    useState(false);
+
+  const [companyError, setCompanyError] =
+    useState("");
+
+
+  async function openCompany(symbol) {
+    setPage("company");
+    setSelectedCompany(null);
+    setCompanyLoading(true);
+    setCompanyError("");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/brief/${encodeURIComponent(
+          symbol
+        )}`
+      );
+
+      if (!response.ok) {
+        let message =
+          "Unable to retrieve company information.";
+
+        try {
+          const errorData =
+            await response.json();
+
+          if (errorData.detail) {
+            message = errorData.detail;
+          }
+        } catch {
+          // Keep default message.
+        }
+
+        throw new Error(message);
+      }
+
+      const data = await response.json();
+
+      setSelectedCompany(data);
+    } catch (error) {
+      console.error(error);
+
+      setCompanyError(
+        error.message ||
+          "Unable to retrieve company information."
+      );
+    } finally {
+      setCompanyLoading(false);
+    }
+  }
+
 
   function goHome() {
-    setSelectedCompany(null);
     setPage("home");
+    setSelectedCompany(null);
+    setCompanyError("");
 
     window.scrollTo({
       top: 0,
@@ -1108,29 +1654,25 @@ function App() {
     });
   }
 
-  function openCompany(company) {
-    setSelectedCompany(company);
-    setPage("company");
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }
 
   function showAbout() {
-    setSelectedCompany(null);
     setPage("about");
+    setSelectedCompany(null);
+    setCompanyError("");
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
+
 
   return (
     <div className="app">
-      <a className="skip-link" href="#main-content">
+      <a
+        className="skip-link"
+        href="#main-content"
+      >
         Skip to main content
       </a>
 
@@ -1143,12 +1685,19 @@ function App() {
             aria-label="Return to TickerBrief AI homepage"
           >
             <span className="brand-icon">
-              <FiBarChart2 aria-hidden="true" />
+              <FiBarChart2
+                aria-hidden="true"
+              />
             </span>
 
             <span className="brand-copy">
-              <strong>TickerBrief AI</strong>
-              <small>Market insight, simplified</small>
+              <strong>
+                TickerBrief AI
+              </strong>
+
+              <small>
+                Market insight, simplified
+              </small>
             </span>
           </button>
 
@@ -1176,39 +1725,51 @@ function App() {
               onClick={showAbout}
             >
               <FiInfo aria-hidden="true" />
-              Project About
+              About 
             </button>
           </nav>
         </div>
       </header>
 
       {page === "home" && (
-        <HomePage openCompany={openCompany} />
+        <HomePage
+          openCompany={openCompany}
+        />
       )}
 
-      {page === "company" && selectedCompany && (
+      {page === "company" && (
         <CompanyPage
           company={selectedCompany}
+          loading={companyLoading}
+          error={companyError}
           goHome={goHome}
         />
       )}
 
-      {page === "about" && <AboutPage />}
+      {page === "about" && (
+        <AboutPage />
+      )}
 
       <footer>
         <div className="footer-inner">
           <div>
-            <strong>TickerBrief AI</strong>
-            <span>Stock Market Insight App</span>
+            <strong>
+              TickerBrief AI
+            </strong>
+
+            <span>
+              LLM Stock Market Insight App
+            </span>
           </div>
 
           <p>
-            © 2026 Caden Smith
+            © 2026 Caden Smith. All rights reserved.
           </p>
         </div>
       </footer>
     </div>
   );
 }
+
 
 export default App;
