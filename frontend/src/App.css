@@ -1,3 +1,19 @@
+/*
+
+  Design Formatting Help: OpenAI ChatGPT was used to help develop the 
+  homepage layout, responsive CSS structure, formatting  
+   and accessibility-focused interface features.
+
+  The  implementation, content decisions, revisions, and project integration
+  were reviewed and incorporated by Caden Smith.
+
+  Source: OpenAI ChatGPT — https://chatgpt.com/
+  Accessed: August 2026
+*/
+
+
+
+
 :root {
   --background: #07111f;
   --background-soft: #091725;

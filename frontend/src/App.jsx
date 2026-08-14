@@ -766,7 +766,7 @@ function HomePage({ openCompany }) {
           ABOUT THE TOOL
         </span>
 
-        <h2>Research a company without the clutter.</h2>
+        <h2>Research any company.</h2>
 
         <div className="purpose-grid">
           <article>
@@ -1087,8 +1087,7 @@ function AboutPage() {
         <p>
           The original interface concept and portions of frontend
           development assistance were created with OpenAI
-          ChatGPT. Final implementation and project decisions
-          were reviewed and incorporated by Caden Smith.
+          ChatGPT. And CSS Formatting was also helped created by ChatGPT.
         </p>
       </section>
     </main>
