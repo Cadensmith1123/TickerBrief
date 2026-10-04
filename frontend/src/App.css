@@ -1,16 +1,3 @@
-/*
-  TickerBrief AI Frontend Design
-  Author: Caden Smith
-
-  Design assistance citation:
-  OpenAI ChatGPT assisted with development of the dashboard layout,
-  formatting, autocomplete search styling, 
-  accessibility-related interface styling.
-
-  Source: OpenAI ChatGPT
-  https://chatgpt.com/
-  Accessed: August 2026
-*/
 
 
 :root {
@@ -316,6 +303,79 @@ nav {
 
 .negative {
   color: var(--red);
+}
+
+
+/* ==========================================
+   TICKERBRIEF — NETWORK NODE HERO BACKGROUND
+   ========================================== */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ambient glow across the entire viewport */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse 45% 85% at 72% 50%,
+      rgba(66, 215, 160, 0.11),
+      transparent 75%
+    ),
+    radial-gradient(
+      ellipse 40% 70% at 18% 65%,
+      rgba(32, 119, 166, 0.08),
+      transparent 80%
+    );
+}
+
+/* Connected network nodes — CSS-only SVG pattern */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
+  pointer-events: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='320' viewBox='0 0 480 320'%3E%3Cg fill='none' stroke='%2342d7a0' stroke-opacity='.22' stroke-width='1'%3E%3Cpath d='M0 76L90 40 175 105 270 35 365 100 480 56M0 225L85 180 175 240 280 170 375 245 480 190M90 40L85 180M175 105L175 240M270 35L280 170M365 100L375 245M85 180L175 105M175 105L280 170M280 170L365 100M175 240L270 35'/%3E%3C/g%3E%3Cg fill='%2342d7a0'%3E%3Ccircle cx='90' cy='40' r='3'/%3E%3Ccircle cx='175' cy='105' r='4'/%3E%3Ccircle cx='270' cy='35' r='3'/%3E%3Ccircle cx='365' cy='100' r='4'/%3E%3Ccircle cx='85' cy='180' r='3'/%3E%3Ccircle cx='175' cy='240' r='3'/%3E%3Ccircle cx='280' cy='170' r='4'/%3E%3Ccircle cx='375' cy='245' r='3'/%3E%3C/g%3E%3Cg fill='%2342d7a0' fill-opacity='.12'%3E%3Ccircle cx='175' cy='105' r='11'/%3E%3Ccircle cx='280' cy='170' r='12'/%3E%3Ccircle cx='365' cy='100' r='11'/%3E%3C/g%3E%3C/svg%3E");
+
+  background-repeat: repeat;
+  background-size: 480px 320px;
+
+  -webkit-mask-image:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.5) 35%,
+      black 75%,
+      rgba(0, 0, 0, 0.55)
+    );
+
+  mask-image:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.5) 35%,
+      black 75%,
+      rgba(0, 0, 0, 0.55)
+    );
+
+  opacity: 0.65;
+}
+
+/* Reduce visual complexity on smaller screens */
+@media (max-width: 900px) {
+  .hero::after {
+    opacity: 0.35;
+    background-size: 360px 240px;
+  }
 }
 
 
