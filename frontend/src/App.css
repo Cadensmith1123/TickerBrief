@@ -624,6 +624,57 @@ nav {
 }
 
 
+.backend-loading-status {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+
+  line-height: 1.5;
+  text-align: left;
+}
+
+
+.backend-loading-status small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--muted-dark);
+
+  font-size: 10px;
+}
+
+
+.backend-loading-spinner {
+  width: 17px;
+  height: 17px;
+
+  flex: 0 0 17px;
+
+  border: 2px solid var(--border);
+  border-top-color: var(--green);
+  border-radius: 50%;
+
+  animation: backend-status-spin 0.8s linear infinite;
+}
+
+
+@keyframes backend-status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .backend-loading-spinner {
+    animation: none;
+  }
+}
+
+
 .snapshot-loading,
 .snapshot-error {
   margin-top: 35px;

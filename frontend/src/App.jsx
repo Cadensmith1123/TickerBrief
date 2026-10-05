@@ -338,6 +338,46 @@ function AboutToolSection() {
 }
 
 
+function BackendLoadingStatus({ label }) {
+  const [serviceWaking, setServiceWaking] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setServiceWaking(true);
+    }, 1800);
+
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <div
+      className="backend-loading-status"
+      role="status"
+      aria-live="polite"
+    >
+      <span
+        className="backend-loading-spinner"
+        aria-hidden="true"
+      />
+
+      <div>
+        <span>
+          {serviceWaking
+            ? "The backend may be waking from idle..."
+            : label}
+        </span>
+
+        {serviceWaking && (
+          <small>
+            Fresh data will appear automatically when it responds.
+          </small>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 function HomePage({ openCompany }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -571,7 +611,9 @@ function HomePage({ openCompany }) {
 
           {moversLoading && (
             <div className="snapshot-loading">
-              Loading current market data...
+              <BackendLoadingStatus
+                label="Loading current market data..."
+              />
             </div>
           )}
 
@@ -714,7 +756,9 @@ function HomePage({ openCompany }) {
                   >
                     {searchLoading && (
                       <div className="search-status">
-                        Searching companies...
+                        <BackendLoadingStatus
+                          label="Searching companies..."
+                        />
                       </div>
                     )}
 
@@ -824,7 +868,9 @@ function HomePage({ openCompany }) {
 
         {moversLoading && (
           <div className="loading-panel">
-            Loading current market movers...
+            <BackendLoadingStatus
+              label="Loading current market movers..."
+            />
           </div>
         )}
 
@@ -1005,10 +1051,9 @@ function CompanyPage({
 
             <h1>Loading company brief...</h1>
 
-            <p>
-              Retrieving current market and financial
-              information.
-            </p>
+            <BackendLoadingStatus
+              label="Retrieving current market and financial information..."
+            />
           </div>
         </div>
       </main>
