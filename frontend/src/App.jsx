@@ -1442,38 +1442,6 @@ function CompanyPage({
           </div>
         </section>
 
-        <section className="data-source-card">
-          <div className="insight-icon">
-            <FiInfo aria-hidden="true" />
-          </div>
-
-          <div>
-            <span className="section-label">
-              DATA SOURCE
-            </span>
-
-            <h2>
-              Real financial information
-            </h2>
-
-            <p>
-              This company page retrieves its price
-              history and financial information from
-              Yahoo Finance through the yfinance Python
-              package. Values may be delayed or unavailable
-              for some securities.
-            </p>
-
-            <div className="education-warning">
-              <FiShield aria-hidden="true" />
-
-              Educational information only. This is not
-              financial advice or an investment
-              recommendation.
-            </div>
-          </div>
-        </section>
-
         <section className="ai-status-card">
           <div className="insight-icon muted-icon">
             <FiActivity aria-hidden="true" />
@@ -1509,6 +1477,38 @@ function CompanyPage({
                 </p>
               </>
             )}
+          </div>
+        </section>
+
+        <section className="data-source-card">
+          <div className="insight-icon">
+            <FiInfo aria-hidden="true" />
+          </div>
+
+          <div>
+            <span className="section-label">
+              DATA SOURCE
+            </span>
+
+            <h2>
+              Real financial information
+            </h2>
+
+            <p>
+              This company page retrieves its price
+              history and financial information from
+              Yahoo Finance through the yfinance Python
+              package. Values may be delayed or unavailable
+              for some securities.
+            </p>
+
+            <div className="education-warning">
+              <FiShield aria-hidden="true" />
+
+              Educational information only. This is not
+              financial advice or an investment
+              recommendation.
+            </div>
           </div>
         </section>
 
