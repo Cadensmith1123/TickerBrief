@@ -682,8 +682,6 @@ function HomePage({ openCompany }) {
         </div>
       </section>
 
-      <AboutToolSection />
-
       <section className="search-section">
         <div className="section-heading">
           <div>
@@ -1019,6 +1017,8 @@ function HomePage({ openCompany }) {
           educational use only.
         </p>
       </section>
+
+      <AboutToolSection />
     </main>
   );
 }
