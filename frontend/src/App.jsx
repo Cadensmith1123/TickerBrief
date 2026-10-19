@@ -1653,7 +1653,18 @@ function App() {
     useState("");
 
 
-  async function openCompany(symbol) {
+  async function openCompany(
+    symbol,
+    updateHistory = true
+  ) {
+    if (updateHistory) {
+      window.history.pushState(
+        { page: "company", symbol },
+        "",
+        `?t=${encodeURIComponent(symbol)}`
+      );
+    }
+
     setPage("company");
     setSelectedCompany(null);
     setCompanyLoading(true);
@@ -1705,7 +1716,15 @@ function App() {
   }
 
 
-  function goHome() {
+  function goHome(updateHistory = true) {
+    if (updateHistory) {
+      window.history.pushState(
+        { page: "home" },
+        "",
+        window.location.pathname
+      );
+    }
+
     setPage("home");
     setSelectedCompany(null);
     setCompanyError("");
@@ -1717,7 +1736,15 @@ function App() {
   }
 
 
-  function showAbout() {
+  function showAbout(updateHistory = true) {
+    if (updateHistory) {
+      window.history.pushState(
+        { page: "about" },
+        "",
+        "?page=about"
+      );
+    }
+
     setPage("about");
     setSelectedCompany(null);
     setCompanyError("");
@@ -1727,6 +1754,62 @@ function App() {
       behavior: "smooth",
     });
   }
+
+
+  useEffect(() => {
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const ticker = params.get("t");
+
+    if (ticker) {
+      window.history.replaceState(
+        { page: "company", symbol: ticker },
+        ""
+      );
+
+      openCompany(ticker, false);
+    } else if (params.get("page") === "about") {
+      window.history.replaceState(
+        { page: "about" },
+        ""
+      );
+
+      showAbout(false);
+    } else {
+      window.history.replaceState(
+        { page: "home" },
+        ""
+      );
+    }
+
+    function handlePopState(event) {
+      const state = event.state;
+
+      if (
+        state?.page === "company" &&
+        state.symbol
+      ) {
+        openCompany(state.symbol, false);
+      } else if (state?.page === "about") {
+        showAbout(false);
+      } else {
+        goHome(false);
+      }
+    }
+
+    window.addEventListener(
+      "popstate",
+      handlePopState
+    );
+
+    return () =>
+      window.removeEventListener(
+        "popstate",
+        handlePopState
+      );
+  }, []);
 
 
   return (
