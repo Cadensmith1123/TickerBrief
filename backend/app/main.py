@@ -16,6 +16,25 @@ load_dotenv()
 
 
 # ---------------------------------------------------------
+# OpenAI configuration
+# ---------------------------------------------------------
+
+# The key lives only in backend environment variables
+# (Render in production, .env locally). It is never sent
+# to the frontend.
+
+OPENAI_API_KEY = (
+    os.getenv("OPENAI_API_KEY")
+    or os.getenv("LLM_API_KEY")
+)
+
+OPENAI_MODEL = os.getenv(
+    "OPENAI_MODEL",
+    "gpt-4o-mini",
+)
+
+
+# ---------------------------------------------------------
 # FastAPI application
 # ---------------------------------------------------------
 
@@ -240,6 +259,125 @@ def calculate_percent_change(new_value, old_value):
 
 
 # ---------------------------------------------------------
+# OpenAI company summaries
+# ---------------------------------------------------------
+
+openai_client = None
+
+# Avoids paying for a new summary every time the same
+# ticker is opened repeatedly on the same day.
+summary_cache = {}
+
+
+def get_openai_client():
+    """
+    Create the OpenAI client lazily so the API still runs
+    when the package or key is not available.
+    """
+
+    global openai_client
+
+    if not OPENAI_API_KEY:
+        return None
+
+    if openai_client is None:
+        try:
+            from openai import OpenAI
+
+            openai_client = OpenAI(
+                api_key=OPENAI_API_KEY,
+                timeout=25.0,
+            )
+
+        except Exception as setup_error:
+            print(
+                f"OpenAI setup failed: "
+                f"{setup_error}"
+            )
+
+            return None
+
+    return openai_client
+
+
+def generate_company_summary(symbol, name, facts):
+    """
+    Ask OpenAI for a short educational summary built from
+    the real market data already retrieved for the ticker.
+
+    Returns None when AI summaries are unavailable.
+    """
+
+    client = get_openai_client()
+
+    if client is None:
+        return None
+
+    today = datetime.now(
+        timezone.utc
+    ).strftime("%Y-%m-%d")
+
+    cache_key = f"{symbol}:{today}"
+
+    if cache_key in summary_cache:
+        return summary_cache[cache_key]
+
+    fact_lines = [
+        f"- {label}: {value}"
+        for label, value in facts
+        if value is not None
+    ]
+
+    try:
+        response = client.chat.completions.create(
+            model=OPENAI_MODEL,
+            temperature=0.4,
+            max_tokens=220,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You write short, neutral company "
+                        "summaries for TickerBrief AI, a "
+                        "student stock-research project. "
+                        "Use only the data provided. Do "
+                        "not give financial advice or "
+                        "recommend buying or selling."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Write a 3-4 sentence "
+                        f"educational summary of "
+                        f"{name} ({symbol}) for a "
+                        f"beginner, based on these "
+                        f"current figures:\n"
+                        + "\n".join(fact_lines)
+                    ),
+                },
+            ],
+        )
+
+        summary = (
+            response.choices[0]
+            .message.content.strip()
+        )
+
+        summary_cache[cache_key] = summary
+
+        return summary
+
+    except Exception as ai_error:
+        print(
+            f"OpenAI summary failed for "
+            f"{symbol}: {ai_error}"
+        )
+
+        return None
+
+
+# ---------------------------------------------------------
 # Root route
 # ---------------------------------------------------------
 
@@ -252,7 +390,7 @@ def root():
     return {
         "message": "TickerBrief AI backend is running.",
         "data_source": "Yahoo Finance via yfinance",
-        "ai_enabled": False,
+        "ai_enabled": OPENAI_API_KEY is not None,
     }
 
 
@@ -735,6 +873,62 @@ def get_stock_brief(ticker: str):
 
 
         # -------------------------------------------------
+        # Optional OpenAI company summary
+        # -------------------------------------------------
+
+        ai_summary = generate_company_summary(
+            symbol,
+            company_name,
+            [
+                (
+                    "Current price (USD)",
+                    rounded(current_price),
+                ),
+                (
+                    "Day change %",
+                    day_change_percent,
+                ),
+                (
+                    "1-month return %",
+                    month_return_percent,
+                ),
+                (
+                    "3-month return %",
+                    three_month_return_percent,
+                ),
+                (
+                    "1-year return %",
+                    year_return_percent,
+                ),
+                (
+                    "Market cap (USD)",
+                    market_cap,
+                ),
+                (
+                    "Revenue growth %",
+                    revenue_growth,
+                ),
+                (
+                    "Profit margin %",
+                    profit_margin,
+                ),
+                (
+                    "Trailing P/E",
+                    trailing_pe,
+                ),
+                (
+                    "Sector",
+                    info.get("sector"),
+                ),
+                (
+                    "Industry",
+                    info.get("industry"),
+                ),
+            ],
+        )
+
+
+        # -------------------------------------------------
         # Response
         # -------------------------------------------------
 
@@ -839,9 +1033,9 @@ def get_stock_brief(ticker: str):
 
             "chart": chart,
 
-            "ai_enabled": False,
+            "ai_enabled": ai_summary is not None,
 
-            "ai_summary": None,
+            "ai_summary": ai_summary,
 
             "data_source": (
                 "Yahoo Finance via yfinance"
