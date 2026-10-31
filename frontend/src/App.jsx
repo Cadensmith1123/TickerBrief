@@ -275,6 +275,76 @@ function MarketChart({ chart }) {
 }
 
 
+function ForecastSummary({ forecast, currency }) {
+  return (
+    <section
+      className="forecast-panel"
+      aria-labelledby="forecast-heading"
+    >
+      <div className="forecast-heading">
+        <div>
+          <span className="section-label">
+            EXPERIMENTAL BASELINE
+          </span>
+
+          <h3 id="forecast-heading">
+            30-Trading-Day Forecast
+          </h3>
+        </div>
+
+        <span className="forecast-horizon">
+          Historical-data estimate
+        </span>
+      </div>
+
+      {forecast ? (
+        <>
+          <div className="forecast-values">
+            <div>
+              <span>Estimated midpoint</span>
+              <strong>
+                {formatMoney(
+                  forecast.estimate,
+                  currency
+                )}
+              </strong>
+              <small>
+                {formatPercent(
+                  forecast.estimated_change_percent
+                )}{" "}
+                from recent price
+              </small>
+            </div>
+
+            <div>
+              <span>Illustrative volatility range</span>
+              <strong>
+                {formatMoney(forecast.lower, currency)}
+                {" – "}
+                {formatMoney(forecast.upper, currency)}
+              </strong>
+            </div>
+          </div>
+
+          <p className="forecast-disclaimer">
+            A simple projection from recent price drift and
+            volatility ({forecast.history_return_count} daily
+            returns). This range is illustrative, not a
+            statistically calibrated confidence interval or
+            financial advice.
+          </p>
+        </>
+      ) : (
+        <p className="forecast-disclaimer">
+          There is not enough recent price history to calculate
+          this baseline.
+        </p>
+      )}
+    </section>
+  );
+}
+
+
 function AboutToolSection() {
   return (
     <section className="purpose-section">
@@ -1240,6 +1310,11 @@ function CompanyPage({
 
             <MarketChart
               chart={company.chart}
+            />
+
+            <ForecastSummary
+              forecast={company.forecast}
+              currency={company.currency}
             />
           </section>
 

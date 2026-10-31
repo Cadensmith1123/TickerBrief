@@ -1703,6 +1703,64 @@ nav {
   text-align: center;
 }
 
+.forecast-panel {
+  margin-top: 20px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(7, 17, 31, 0.62);
+}
+
+.forecast-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.forecast-heading h3 {
+  margin: 5px 0 0;
+  font-size: 16px;
+}
+
+.forecast-horizon {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+}
+
+.forecast-values {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.forecast-values > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.forecast-values span,
+.forecast-values small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.forecast-values strong {
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.forecast-disclaimer {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
 
 /* COMPANY OVERVIEW */
 

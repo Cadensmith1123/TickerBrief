@@ -4,6 +4,8 @@ TickerBrief AI is an LLM Stock Market Insight App. The goal of the project is to
 
 This project is for educational purposes only and does not provide financial advice.
 
+The company brief includes an experimental 30-trading-day baseline estimate based on recent price drift and volatility. Its range is illustrative, not a guarantee or investment recommendation.
+
 ## Project Structure
 
 ```text

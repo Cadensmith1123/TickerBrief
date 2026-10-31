@@ -1,5 +1,7 @@
+import math
 import os
 import re
+import statistics
 from datetime import datetime, timezone
 
 import yfinance as yf
@@ -256,6 +258,81 @@ def calculate_percent_change(new_value, old_value):
         ((new_number - old_number) / old_number) * 100,
         2,
     )
+
+
+def calculate_price_forecast(closes, horizon=30):
+    """
+    Create a simple drift-based price estimate and an
+    illustrative range from recent daily volatility.
+    """
+
+    prices = []
+
+    for value in closes:
+        price = safe_float(value)
+
+        if (
+            price is not None
+            and math.isfinite(price)
+            and price > 0
+        ):
+            prices.append(price)
+
+    if len(prices) < 31:
+        return None
+
+    recent_prices = prices[-61:]
+    daily_returns = [
+        math.log(current / previous)
+        for previous, current in zip(
+            recent_prices,
+            recent_prices[1:],
+        )
+    ]
+
+    if not daily_returns:
+        return None
+
+    daily_drift = statistics.mean(daily_returns)
+    daily_volatility = (
+        statistics.stdev(daily_returns)
+        if len(daily_returns) > 1
+        else 0
+    )
+
+    try:
+        estimate = prices[-1] * math.exp(
+            daily_drift * horizon
+        )
+        range_width = (
+            1.2816
+            * daily_volatility
+            * math.sqrt(horizon)
+        )
+        lower = estimate * math.exp(-range_width)
+        upper = estimate * math.exp(range_width)
+    except OverflowError:
+        return None
+
+    if not all(
+        math.isfinite(value)
+        for value in (estimate, lower, upper)
+    ):
+        return None
+
+    return {
+        "horizon_trading_days": horizon,
+        "estimate": rounded(estimate),
+        "lower": rounded(lower),
+        "upper": rounded(upper),
+        "estimated_change_percent": (
+            calculate_percent_change(
+                estimate,
+                prices[-1],
+            )
+        ),
+        "history_return_count": len(daily_returns),
+    }
 
 
 # ---------------------------------------------------------
@@ -767,6 +844,8 @@ def get_stock_brief(ticker: str):
                 }
             )
 
+        forecast = calculate_price_forecast(closes)
+
 
         # -------------------------------------------------
         # Company information
@@ -1032,6 +1111,8 @@ def get_stock_brief(ticker: str):
             ),
 
             "chart": chart,
+
+            "forecast": forecast,
 
             "ai_enabled": ai_summary is not None,
 
